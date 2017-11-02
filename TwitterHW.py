@@ -43,7 +43,7 @@ def get_tweets():
         #adds to cache
         CACHE_DICTION['umsi'] = s
         cache_file = open(CACHE_FNAME, "w")
-        cache_file.write(json.dumps(CACHE_DICTION[search1])+"\n")
+        cache_file.write(json.dumps(CACHE_DICTION))
         cache_file.close()
     return(s)
         
@@ -75,7 +75,7 @@ umsi_tweets = get_tweets()
 
 # 4 - Use a for loop, the cursor you defined above to execute INSERT statements, that insert the data from each of the tweets in umsi_tweets into the correct columns in each row of the Tweets database table.
 for tw in umsi_tweets:
-    tup = tw["id"], tw["user"], tw["screen_name"], tw["created_at"], tw ["text"], tw["retweet_count"]
+    tup = tw["id"], tw["user"]["screen_name"], tw["created_at"], tw ["text"], tw["retweet_count"]
     cursor.execute("INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES (?,?,?,?,?)", tup)
 
 #  5- Use the database connection to commit the changes to the database
@@ -90,8 +90,8 @@ conn.commit()
     # Mon Oct 09 15:45:45 +0000 2017 - RT @MikeRothCom: Beautiful morning at @UMich - It’s easy to forget to
     # take in the view while running from place to place @umichDLHS  @umich…
 # Include the blank line between each tweet.
-cur.execute("SELECT time_posted, tweet_text FROM Tweets")
-all_res = cur.fetchall()
+cursor.execute("SELECT time_posted, tweet_text FROM Tweets")
+all_res = cursor.fetchall()
 for t in all_res:
     print(t[0] + " - " + t[1]+ "\n")
 
@@ -99,7 +99,11 @@ for t in all_res:
 # Select the author of all of the tweets (the full rows/tuples of information) that have been retweeted MORE
 # than 2 times, and fetch them into the variable more_than_2_rts.
 # Print the results
-cur.execute("SELECT author FROM Tweets WHERE retweets >2")
+cursor.execute("SELECT author FROM Tweets WHERE retweets >2")
+more_than_2_rts = cursor.fetchall()
+print("more_than_2_rts - %s" % set(more_than_2_rts))
+
+cursor.close()
 
 
 
